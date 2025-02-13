@@ -1,13 +1,14 @@
 import {
   GoogleMap,
   Marker,
+  Polyline,
   useJsApiLoader,
   Autocomplete,
 } from "@react-google-maps/api";
-import { findClosestFive } from "../utils/findClosestFive";
-import { useState, useCallback } from "react";
-import * as turf from "@turf/turf";
-import { useWindborneData, WindborneBalloon } from "../hooks/useWindborneData";
+import { findClosestFive, BalloonWithDistance } from "../utils/findClosestFive";
+import React, { useState } from "react";
+import { useWindborneData } from "../hooks/useWindborneData";
+import BalloonDetailModal from "./BalloonDetailModals";
 
 const containerStyle = {
   width: "100%",
@@ -67,14 +68,20 @@ const Map = () => {
 
   const [searchLocation, setSearchLocation] =
     useState<google.maps.LatLngLiteral | null>(null);
-  const [closestFive, setClosestFive] = useState<WindborneBalloon[]>([]);
+  const [closestFive, setClosestFive] = useState<BalloonWithDistance[]>([]);
   const [autoComplete, setAutoComplete] =
     useState<google.maps.places.Autocomplete | null>(null);
-  const [userPosition, setUserPosition] =
-    useState<google.maps.LatLngLiteral | null>(null);
+  const [selectedBalloon, setSelectedBalloon] =
+    useState<WindborneBalloon | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const onLoad = (auto: google.maps.places.Autocomplete) => {
     setAutoComplete(auto);
+  };
+
+  const onMarkerClick = (balloon: WindborneBalloon) => {
+    setSelectedBalloon(balloon);
+    setModalOpen(true);
   };
 
   const onPlaceChanged = () => {
@@ -89,37 +96,13 @@ const Map = () => {
         setSearchLocation(location);
         // Find the 5 closest balloons to the search location
         const closest = findClosestFive(location, balloons);
+        console.log("Closest balloons:", closest);
         setClosestFive(closest);
       }
     }
   };
 
   console.log(closestFive);
-  const handleMapClick = useCallback((event: google.maps.MapMouseEvent) => {
-    if (!event.latLng) return;
-
-    const userLatLng = {
-      lat: event.latLng.lat(),
-      lng: event.latLng.lng(),
-    };
-
-    setUserPosition(userLatLng);
-    findClosestBalloon(userLatLng);
-  }, []);
-
-  const findClosestBalloon = (userLatLng: google.maps.LatLngLiteral) => {
-    const userPoint = turf.point([userLatLng.lng, userLatLng.lat]);
-    const balloonPoints = balloonLocations.map((loc) =>
-      turf.point([loc.lng, loc.lat]),
-    );
-    const balloonCollection = turf.featureCollection(balloonPoints);
-    const nearestBalloon = turf.nearestPoint(userPoint, balloonCollection);
-
-    setClosestBalloon({
-      lat: nearestBalloon.geometry.coordinates[1],
-      lng: nearestBalloon.geometry.coordinates[0],
-    });
-  };
 
   if (!isLoaded) return <div>Loading Map...</div>;
   if (loading) return <div>Loading Balloon Data...</div>;
@@ -136,7 +119,6 @@ const Map = () => {
         mapContainerStyle={containerStyle}
         center={center}
         zoom={2}
-        onClick={handleMapClick}
         options={mapOptions}
       >
         {balloons.map((balloon, index) => (
@@ -151,29 +133,60 @@ const Map = () => {
               strokeColor: "red",
               strokeWeight: 0.5,
             }}
+            onClick={() => onMarkerClick(balloon)}
           />
         ))}
         {searchLocation && (
           <Marker
             position={searchLocation}
             icon="https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+            onClick={() => onMarkerClick(searchLocation)}
           />
         )}
-        {closestFive.map((balloon, index) => (
-          <Marker
-            key={`closest-${index}`}
-            position={{ lat: balloon.latitude, lng: balloon.longitude }}
-            icon={{
-              path: google.maps.SymbolPath.CIRCLE,
-              fillColor: "green",
-              fillOpacity: 1,
-              scale: 7,
-              strokeColor: "green",
-              strokeWeight: 1,
-            }}
-          />
-        ))}
+        {searchLocation &&
+          closestFive.map((closest, index) => {
+            return (
+              <React.Fragment key={`closest-${index}`}>
+                {/* Draw the polyline */}
+                <Polyline
+                  path={[
+                    searchLocation,
+                    {
+                      lat: closest.balloon.latitude,
+                      lng: closest.balloon.longitude,
+                    },
+                  ]}
+                  options={{
+                    strokeColor: "green",
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                  }}
+                />
+                {/* Marker for the closest balloon */}
+                <Marker
+                  position={{
+                    lat: closest.balloon.latitude,
+                    lng: closest.balloon.longitude,
+                  }}
+                  icon={{
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: "green",
+                    fillOpacity: 1,
+                    scale: 7,
+                    strokeColor: "green",
+                    strokeWeight: 1,
+                  }}
+                  onClick={() => onMarkerClick(closest.balloon)}
+                />
+              </React.Fragment>
+            );
+          })}
       </GoogleMap>
+      <BalloonDetailModal
+        balloon={selectedBalloon}
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
     </>
   );
 };
