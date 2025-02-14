@@ -17,11 +17,12 @@ interface BalloonDetailModalProps {
 
 const modalStyle = {
   position: "fixed" as const,
-  left: 0,
-  top: 0,
+  left: "10%",
+  top: "50%",
+  transform: "translateY(-70%)",
   width: "30%",
-  height: "100%",
-  bgcolor: "background.paper",
+  height: "40%",
+  bgcolor: "#11213E",
   boxShadow: 24,
   p: 4,
   overflowY: "auto",
@@ -71,16 +72,16 @@ const BalloonDetailModal = ({
       <Box sx={modalStyle}>
         {balloon ? (
           <>
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="h6" gutterBottom color="white" fontSize="14px">
               Balloon Details
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" color="white" fontSize="14px">
               <strong>Latitude:</strong> {balloon.latitude.toFixed(4)}
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" color="white" fontSize="14px">
               <strong>Longitude:</strong> {balloon.longitude.toFixed(4)}
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" color="white" fontSize="14px">
               <strong>Altitude:</strong> {balloon.altitude} km
             </Typography>
             {loading ? (
@@ -90,7 +91,7 @@ const BalloonDetailModal = ({
             ) : (
               <>
                 {address && (
-                  <Typography variant="body1">
+                  <Typography variant="body1" color="white" fontSize="14px">
                     <strong>Address (as Plus Code):</strong> {address}
                   </Typography>
                 )}
@@ -102,26 +103,26 @@ const BalloonDetailModal = ({
                         alt="Weather icon"
                         style={{ width: 50, height: 50, marginRight: 8 }}
                       />
-                      <Typography variant="body1">
-                        <strong>Weather:</strong> {weather.description}
+                      <Typography variant="body1" fontSize="14px" color="white">
+                        {weather.description}
                       </Typography>
                     </Box>
-                    <Typography variant="body1">
+                    <Typography variant="body1" fontSize="14px" color="white">
                       <strong>Temperature:</strong> {weather.temperature}°C
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" color="white" fontSize="14px">
                       <strong>Wind Speed:</strong> {weather.windSpeed} m/s
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" color="white" fontSize="14px">
                       <strong>Humidity:</strong> {weather.humidity}%
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography fontSize="14px" variant="body1" color="white">
                       <strong>Pressure:</strong> {weather.pressure} hPa
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" fontSize="14px" color="white">
                       <strong>Sunrise:</strong> {formatTime(weather.sunrise)}
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" color="white" fontSize="14px">
                       <strong>Sunset:</strong> {formatTime(weather.sunset)}
                     </Typography>
                   </>
