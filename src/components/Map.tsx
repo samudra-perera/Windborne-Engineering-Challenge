@@ -164,26 +164,29 @@ const Map = () => {
           exclusive
           onChange={handleTimeChange}
           aria-label="Select time"
+          sx={{
+            color: "white",
+          }}
         >
-          <ToggleButton value={0} aria-label="Live">
+          <ToggleButton value={0} aria-label="Live" sx={{ color: "white" }}>
             Live
           </ToggleButton>
-          <ToggleButton value={1} aria-label="1">
+          <ToggleButton value={1} aria-label="1" sx={{ color: "white" }}>
             1h
           </ToggleButton>
-          <ToggleButton value={3} aria-label="3">
+          <ToggleButton value={3} aria-label="3" sx={{ color: "white" }}>
             3h
           </ToggleButton>
-          <ToggleButton value={7} aria-label="7">
+          <ToggleButton value={7} aria-label="7" sx={{ color: "white" }}>
             7h
           </ToggleButton>
-          <ToggleButton value={12} aria-label="12">
+          <ToggleButton value={12} aria-label="12" sx={{ color: "white" }}>
             12h
           </ToggleButton>
-          <ToggleButton value={16} aria-label="16">
+          <ToggleButton sx={{ color: "white" }} value={16} aria-label="16">
             16h
           </ToggleButton>
-          <ToggleButton value={23} aria-label="23">
+          <ToggleButton value={23} aria-label="23" sx={{ color: "white" }}>
             23h
           </ToggleButton>
         </ToggleButtonGroup>
