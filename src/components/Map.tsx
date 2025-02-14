@@ -131,9 +131,41 @@ const Map = () => {
 
   return (
     <>
-      <div>
+      <div
+        style={{
+          position: "absolute",
+          top: "20px",
+          left: "5%",
+          transform: "translateX(-10%)",
+          zIndex: 10,
+          width: "90%",
+          maxWidth: "500px",
+          backgroundColor: "black",
+          padding: "10px 10px",
+          borderRadius: "8px",
+          // alignItems: "center",
+          color: "white",
+          // justifyContent: "center",
+        }}
+      >
         <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-          <input type="text" placeholder="Enter a location" />
+          <input
+            type="text"
+            placeholder="Find the five closest balloons..."
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              height: "40px",
+              fontSize: "16px",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              padding: "0 10px",
+              outline: "none",
+              flex: 1,
+              backgroundColor: "black",
+            }}
+          />
         </Autocomplete>
       </div>
       <GoogleMap
