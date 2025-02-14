@@ -61,6 +61,11 @@ const BalloonDetailModal = ({
     }
   }, [balloon]);
 
+  // Helper: Convert Unix time to local time string
+  const formatTime = (unixTime: number) => {
+    return new Date(unixTime * 1000).toLocaleTimeString();
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={modalStyle}>
@@ -76,7 +81,7 @@ const BalloonDetailModal = ({
               <strong>Longitude:</strong> {balloon.longitude.toFixed(4)}
             </Typography>
             <Typography variant="body1">
-              <strong>Altitude:</strong> {balloon.altitude} m
+              <strong>Altitude:</strong> {balloon.altitude} km
             </Typography>
             {loading ? (
               <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
@@ -86,16 +91,38 @@ const BalloonDetailModal = ({
               <>
                 {address && (
                   <Typography variant="body1">
-                    <strong>Address:</strong> {address}
+                    <strong>Address (as Plus Code):</strong> {address}
                   </Typography>
                 )}
                 {weather && (
                   <>
-                    <Typography variant="body1">
-                      <strong>Weather:</strong> {weather.description}
-                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center", my: 1 }}>
+                      <img
+                        src={weather.icon}
+                        alt="Weather icon"
+                        style={{ width: 50, height: 50, marginRight: 8 }}
+                      />
+                      <Typography variant="body1">
+                        <strong>Weather:</strong> {weather.description}
+                      </Typography>
+                    </Box>
                     <Typography variant="body1">
                       <strong>Temperature:</strong> {weather.temperature}°C
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Wind Speed:</strong> {weather.windSpeed} m/s
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Humidity:</strong> {weather.humidity}%
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Pressure:</strong> {weather.pressure} hPa
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Sunrise:</strong> {formatTime(weather.sunrise)}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Sunset:</strong> {formatTime(weather.sunset)}
                     </Typography>
                   </>
                 )}

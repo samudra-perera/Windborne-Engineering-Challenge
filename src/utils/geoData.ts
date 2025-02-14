@@ -1,6 +1,13 @@
 export interface WeatherData {
+  location: string;
   description: string;
   temperature: number;
+  windSpeed: number;
+  humidity: number;
+  pressure: number;
+  icon: string;
+  sunrise: number;
+  sunset: number;
 }
 
 export async function getWeather(
@@ -17,10 +24,37 @@ export async function getWeather(
     }
 
     const data = await response.json();
-    if (data.weather && data.weather.length > 0 && data.main) {
+    console.log(data);
+    if (
+      data.weather &&
+      data.weather.length > 0 &&
+      data.main &&
+      data.wind &&
+      data.name &&
+      data.name &&
+      data.sys
+    ) {
+      const description = data.weather[0].description;
+      const temperature = data.main.temp;
+      const windSpeed = data.wind.speed;
+      const humidity = data.main.humidity;
+      const pressure = data.main.pressure;
+      const location = `${data.name}, ${data.sys.country}`;
+      const iconCode = data.weather[0].icon;
+      const iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
+      const sunrise = data.sys.sunrise;
+      const sunset = data.sys.sunset;
+
       return {
-        description: data.weather[0].description,
-        temperature: data.main.temp,
+        location,
+        description,
+        temperature,
+        windSpeed,
+        humidity,
+        pressure,
+        icon: iconUrl,
+        sunrise,
+        sunset,
       };
     } else {
       throw new Error("No results found");
@@ -45,7 +79,8 @@ export async function reverseGeocode(
     }
 
     const data = await response.json();
-    if (data.results && data.result.length > 0) {
+    console.log(data);
+    if (data.results) {
       return data.results[0].formatted_address;
     } else {
       throw new Error("No results found");

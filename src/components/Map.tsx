@@ -5,10 +5,20 @@ import {
   useJsApiLoader,
   Autocomplete,
 } from "@react-google-maps/api";
-import { findClosestFive, BalloonWithDistance } from "../utils/findClosestFive";
+import {
+  findClosestFive,
+  BalloonWithDistance,
+  calcuateWeightedAverageWeather,
+} from "../utils/findClosestFive";
 import React, { useState } from "react";
 import { useWindborneData } from "../hooks/useWindborneData";
 import BalloonDetailModal from "./BalloonDetailModals";
+import { WeatherData } from "../utils/geoData";
+import {
+  generateGradientPolygon,
+  GradientPolygon,
+} from "../utils/interpolateGrid";
+import GradientOverlay from "./GradientOverlay";
 
 const containerStyle = {
   width: "100%",
@@ -60,7 +70,7 @@ const center = { lat: 0, lng: 0 }; // Default center
 const Map = () => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY!,
-    libraries: ["places"],
+    libraries: ["places", "visualization"],
   });
 
   // Custom fetch to balloon data
@@ -74,6 +84,11 @@ const Map = () => {
   const [selectedBalloon, setSelectedBalloon] =
     useState<WindborneBalloon | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [averageWeather, setAverageWeather] =
+    useState<Partial<WeatherData> | null>(null);
+  const [gradientPolygons, setGradientPolygons] = useState<GradientPolygon[]>(
+    [],
+  );
 
   const onLoad = (auto: google.maps.places.Autocomplete) => {
     setAutoComplete(auto);
@@ -84,7 +99,7 @@ const Map = () => {
     setModalOpen(true);
   };
 
-  const onPlaceChanged = () => {
+  const onPlaceChanged = async () => {
     if (autoComplete) {
       const place = autoComplete.getPlace();
       if (place?.geometry?.location) {
@@ -95,14 +110,20 @@ const Map = () => {
         console.log("Place changed", location);
         setSearchLocation(location);
         // Find the 5 closest balloons to the search location
-        const closest = findClosestFive(location, balloons);
+        const closest = await findClosestFive(location, balloons);
         console.log("Closest balloons:", closest);
         setClosestFive(closest);
+        // Calculate the weighted average weather
+        const avgWeather = calcuateWeightedAverageWeather(closest);
+        console.log("Average weather:", avgWeather);
+        setAverageWeather(avgWeather);
+        // Generate the gradient polygons
+        const polygons = generateGradientPolygon(location, closest, 5, 0.3);
+        console.log("Gradient polygons:", polygons);
+        setGradientPolygons(polygons);
       }
     }
   };
-
-  console.log(closestFive);
 
   if (!isLoaded) return <div>Loading Map...</div>;
   if (loading) return <div>Loading Balloon Data...</div>;
@@ -181,6 +202,7 @@ const Map = () => {
               </React.Fragment>
             );
           })}
+        <GradientOverlay polygons={gradientPolygons} />
       </GoogleMap>
       <BalloonDetailModal
         balloon={selectedBalloon}
