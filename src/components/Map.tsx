@@ -19,6 +19,7 @@ import {
   GradientPolygon,
 } from "../utils/interpolateGrid";
 import GradientOverlay from "./GradientOverlay";
+import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 const containerStyle = {
   width: "100%",
@@ -73,8 +74,10 @@ const Map = () => {
     libraries: ["places", "visualization"],
   });
 
+  const [selectedTime, setSelectedTime] = useState(0);
+
   // Custom fetch to balloon data
-  const { balloons, loading, error } = useWindborneData(0);
+  const { balloons, loading, error } = useWindborneData(selectedTime);
 
   const [searchLocation, setSearchLocation] =
     useState<google.maps.LatLngLiteral | null>(null);
@@ -125,12 +128,66 @@ const Map = () => {
     }
   };
 
+  // Handler for time selection
+  const handleTimeChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newTime: number,
+  ) => {
+    if (newTime !== null) {
+      console.log("New time selected:", newTime);
+      setClosestFive([]);
+      setAverageWeather(null);
+      setGradientPolygons([]);
+      setSelectedTime(newTime);
+    }
+  };
+
   if (!isLoaded) return <div>Loading Map...</div>;
   if (loading) return <div>Loading Balloon Data...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <>
+      <div
+        style={{
+          position: "absolute",
+          bottom: "20px",
+          left: "20px",
+          zIndex: 10,
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          borderRadius: "8px",
+          padding: "8px",
+        }}
+      >
+        <ToggleButtonGroup
+          value={selectedTime}
+          exclusive
+          onChange={handleTimeChange}
+          aria-label="Select time"
+        >
+          <ToggleButton value={0} aria-label="Live">
+            Live
+          </ToggleButton>
+          <ToggleButton value={1} aria-label="1">
+            1h
+          </ToggleButton>
+          <ToggleButton value={3} aria-label="3">
+            3h
+          </ToggleButton>
+          <ToggleButton value={7} aria-label="7">
+            7h
+          </ToggleButton>
+          <ToggleButton value={12} aria-label="12">
+            12h
+          </ToggleButton>
+          <ToggleButton value={16} aria-label="16">
+            16h
+          </ToggleButton>
+          <ToggleButton value={23} aria-label="23">
+            23h
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </div>
       <div
         style={{
           position: "absolute",
