@@ -16,12 +16,13 @@ export const useWindborneData = (hourOffset: number = 0) => {
       const validHourOffset = Math.max(0, Math.min(23, hourOffset));
       const hourString = validHourOffset.toString().padStart(2, "0");
 
-      // Use the CORS proxy. Make sure you have access; sometimes you must visit a demo page first.
+      // Use the CORS proxy.
       const proxyUrl = "https://cors-anywhere.herokuapp.com/";
       const targetUrl = `https://a.windbornesystems.com/treasure/${hourString}.json`;
       const url = proxyUrl + targetUrl;
 
       try {
+        setLoading(true);
         const response = await fetch(url);
         console.log("Response", response);
         if (!response.ok) {
@@ -29,18 +30,18 @@ export const useWindborneData = (hourOffset: number = 0) => {
         }
 
         const text = await response.text();
-        //Replace NANs with null
-        const santizedText = text.replace(/\bNaN\b/g, "null");
+        // Replace literal NaN values with null
+        const sanitizedText = text.replace(/\bNaN\b/g, "null");
 
-        const data: number[][] = JSON.parse(santizedText);
+        const data: number[][] = JSON.parse(sanitizedText);
         console.log("Raw Data", data);
 
-        //Filter out any entry that contains NaN
-        const validData = data.filter((item) => {
-          return !item.some((value) => value === null);
-        });
+        // Filter out any entry that contains null
+        const validData = data.filter(
+          (item) => !item.some((value) => value === null),
+        );
 
-        //Transform the list in array of objects
+        // Transform the list into an array of objects
         const transformedData = validData.map((item) => ({
           latitude: item[0],
           longitude: item[1],
@@ -55,7 +56,19 @@ export const useWindborneData = (hourOffset: number = 0) => {
       }
     }
 
+    // Always fetch data immediately
     fetchBalloonData();
+
+    // If hourOffset is 0 (live), set up polling every 5 minutes (300,000 ms)
+    let intervalId: NodeJS.Timeout | undefined;
+    if (hourOffset === 0) {
+      intervalId = setInterval(fetchBalloonData, 300000);
+    }
+
+    // Clean up interval on unmount or when hourOffset changes
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [hourOffset]);
 
   return { balloons, loading, error };

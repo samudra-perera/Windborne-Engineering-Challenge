@@ -195,8 +195,7 @@ const Map = () => {
         style={{
           position: "absolute",
           top: "20px",
-          left: "5%",
-          transform: "translateX(-10%)",
+          left: "20px",
           zIndex: 10,
           width: "90%",
           maxWidth: "500px",
