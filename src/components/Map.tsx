@@ -168,26 +168,89 @@ const Map = () => {
             color: "white",
           }}
         >
-          <ToggleButton value={0} aria-label="Live" sx={{ color: "white" }}>
+          <ToggleButton
+            value={0}
+            aria-label="Live"
+            sx={{
+              color: "white",
+              "&.Mui-selected": {
+                color: "#1D2C4D",
+              },
+            }}
+          >
             Live
           </ToggleButton>
-          <ToggleButton value={1} aria-label="1" sx={{ color: "white" }}>
+          <ToggleButton
+            value={1}
+            aria-label="1"
+            sx={{
+              color: "white",
+              "&.Mui-selected": {
+                color: "#1D2C4D",
+              },
+            }}
+          >
             1h
           </ToggleButton>
-          <ToggleButton value={3} aria-label="3" sx={{ color: "white" }}>
+          <ToggleButton
+            value={3}
+            aria-label="3"
+            sx={{
+              color: "white",
+              "&.Mui-selected": {
+                color: "#1D2C4D",
+              },
+            }}
+          >
             3h
           </ToggleButton>
-          <ToggleButton value={7} aria-label="7" sx={{ color: "white" }}>
+          <ToggleButton
+            value={7}
+            aria-label="7"
+            sx={{
+              color: "white",
+              "&.Mui-selected": {
+                color: "#1D2C4D",
+              },
+            }}
+          >
             7h
           </ToggleButton>
-          <ToggleButton value={12} aria-label="12" sx={{ color: "white" }}>
+          <ToggleButton
+            value={12}
+            aria-label="12"
+            sx={{
+              color: "white",
+              "&.Mui-selected": {
+                color: "#1D2C4D",
+              },
+            }}
+          >
             12h
           </ToggleButton>
-          <ToggleButton sx={{ color: "white" }} value={16} aria-label="16">
+          <ToggleButton
+            value={16}
+            aria-label="16"
+            sx={{
+              color: "white",
+              "&.Mui-selected": {
+                color: "#1D2C4D",
+              },
+            }}
+          >
             16h
           </ToggleButton>
-          <ToggleButton value={23} aria-label="23" sx={{ color: "white" }}>
-            23h
+          <ToggleButton
+            value={23}
+            aria-label="23"
+            sx={{
+              color: "white",
+              "&.Mui-selected": {
+                color: "#1D2C4D",
+              },
+            }}
+          >
+            24h
           </ToggleButton>
         </ToggleButtonGroup>
       </div>
@@ -202,9 +265,7 @@ const Map = () => {
           backgroundColor: "black",
           padding: "10px 10px",
           borderRadius: "8px",
-          // alignItems: "center",
           color: "white",
-          // justifyContent: "center",
         }}
       >
         <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
