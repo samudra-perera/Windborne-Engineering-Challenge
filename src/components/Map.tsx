@@ -21,6 +21,7 @@ import {
 import GradientOverlay from "./GradientOverlay";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import TemperatureLegend from "./TemperatureLegend";
+import AverageWeatherModal from "./AverageWeatherModal";
 
 const containerStyle = {
   width: "100%",
@@ -93,6 +94,7 @@ const Map = () => {
   const [gradientPolygons, setGradientPolygons] = useState<GradientPolygon[]>(
     [],
   );
+  const [weatherModalOpen, setWeatherModalOpen] = useState(false);
   const [tempRange, setTempRange] = useState<{ min: number; max: number }>({
     min: 0,
     max: 0,
@@ -137,6 +139,9 @@ const Map = () => {
         console.log("Gradient polygons:", polygons);
         setGradientPolygons(polygons);
         setTempRange({ min: minTemp, max: maxTemp });
+
+        //Open average weather modal
+        setWeatherModalOpen(true);
       }
     }
   };
@@ -327,7 +332,9 @@ const Map = () => {
           <Marker
             position={searchLocation}
             icon="https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-            onClick={() => onMarkerClick(searchLocation)}
+            onClick={() => {
+              setWeatherModalOpen(true);
+            }}
           />
         )}
         {searchLocation &&
@@ -373,7 +380,15 @@ const Map = () => {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
       />
-      <TemperatureLegend minTemp={tempRange.min} maxTemp={tempRange.max} />
+      {averageWeather && (
+        <AverageWeatherModal
+          averageWeather={averageWeather}
+          open={weatherModalOpen}
+          onClose={() => setWeatherModalOpen(false)}
+          minTemp={tempRange.min}
+          maxTemp={tempRange.max}
+        />
+      )}
     </>
   );
 };
