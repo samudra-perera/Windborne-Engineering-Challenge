@@ -39,6 +39,15 @@ const AverageWeatherModal: React.FC<AverageWeatherModalProps> = ({
         <Typography variant="h6" gutterBottom color="white" fontSize="14px">
           Regional Average Weather
         </Typography>
+        <Typography
+          variant="caption"
+          color="white"
+          display="block"
+          gutterBottom
+        >
+          Note: Weather data may be approximate due to data limitations and the
+          interpolation method.
+        </Typography>
         {averageWeather ? (
           <>
             <Typography variant="body1" color="white" fontSize="14px">

@@ -10,7 +10,7 @@ import {
   BalloonWithDistance,
   calcuateWeightedAverageWeather,
 } from "../utils/findClosestFive";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useWindborneData, WindborneBalloon } from "../hooks/useWindborneData";
 import BalloonDetailModal from "./BalloonDetailModals";
 import { WeatherData } from "../utils/geoData";
@@ -20,7 +20,6 @@ import {
 } from "../utils/interpolateGrid";
 import GradientOverlay from "./GradientOverlay";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
-import TemperatureLegend from "./TemperatureLegend";
 import AverageWeatherModal from "./AverageWeatherModal";
 
 const containerStyle = {
@@ -75,10 +74,9 @@ const Map = () => {
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY!,
     libraries: ["places", "visualization"],
   });
+  // Custom fetch to balloon data
 
   const [selectedTime, setSelectedTime] = useState(0);
-
-  // Custom fetch to balloon data
   const { balloons, loading, error } = useWindborneData(selectedTime);
 
   const [searchLocation, setSearchLocation] =
