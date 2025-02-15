@@ -10,8 +10,8 @@ import {
   BalloonWithDistance,
   calcuateWeightedAverageWeather,
 } from "../utils/findClosestFive";
-import React, { useState } from "react";
-import { useWindborneData } from "../hooks/useWindborneData";
+import React, { useState, useEffect } from "react";
+import { useWindborneData, WindborneBalloon } from "../hooks/useWindborneData";
 import BalloonDetailModal from "./BalloonDetailModals";
 import { WeatherData } from "../utils/geoData";
 import {
@@ -20,6 +20,7 @@ import {
 } from "../utils/interpolateGrid";
 import GradientOverlay from "./GradientOverlay";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
+import TemperatureLegend from "./TemperatureLegend";
 
 const containerStyle = {
   width: "100%",
@@ -92,6 +93,10 @@ const Map = () => {
   const [gradientPolygons, setGradientPolygons] = useState<GradientPolygon[]>(
     [],
   );
+  const [tempRange, setTempRange] = useState<{ min: number; max: number }>({
+    min: 0,
+    max: 0,
+  });
 
   const onLoad = (auto: google.maps.places.Autocomplete) => {
     setAutoComplete(auto);
@@ -110,20 +115,28 @@ const Map = () => {
           lat: place.geometry.location.lat(),
           lng: place.geometry.location.lng(),
         };
-        console.log("Place changed", location);
+        // Clear previous state immediately
+        setClosestFive([]);
+        setGradientPolygons([]);
         setSearchLocation(location);
-        // Find the 5 closest balloons to the search location
+        console.log("Place changed", location);
+
+        // Proceed with fetching new data and generating overlays
         const closest = await findClosestFive(location, balloons);
         console.log("Closest balloons:", closest);
         setClosestFive(closest);
-        // Calculate the weighted average weather
         const avgWeather = calcuateWeightedAverageWeather(closest);
         console.log("Average weather:", avgWeather);
         setAverageWeather(avgWeather);
-        // Generate the gradient polygons
-        const polygons = generateGradientPolygon(location, closest, 5, 0.3);
+        const { polygons, minTemp, maxTemp } = generateGradientPolygon(
+          location,
+          closest,
+          5,
+          0.3,
+        );
         console.log("Gradient polygons:", polygons);
         setGradientPolygons(polygons);
+        setTempRange({ min: minTemp, max: maxTemp });
       }
     }
   };
@@ -292,6 +305,7 @@ const Map = () => {
         mapContainerStyle={containerStyle}
         center={center}
         zoom={2}
+        key={`map-${searchLocation ? searchLocation.lat : "default"}-${searchLocation ? searchLocation.lng : "default"}`}
         options={mapOptions}
       >
         {balloons.map((balloon, index) => (
@@ -317,43 +331,41 @@ const Map = () => {
           />
         )}
         {searchLocation &&
-          closestFive.map((closest, index) => {
-            return (
-              <React.Fragment key={`closest-${index}`}>
-                {/* Draw the polyline */}
-                <Polyline
-                  path={[
-                    searchLocation,
-                    {
-                      lat: closest.balloon.latitude,
-                      lng: closest.balloon.longitude,
-                    },
-                  ]}
-                  options={{
-                    strokeColor: "green",
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                  }}
-                />
-                {/* Marker for the closest balloon */}
-                <Marker
-                  position={{
+          closestFive.map((closest, index) => (
+            <React.Fragment
+              key={`closest-${searchLocation.lat}-${searchLocation.lng}-${index}`}
+            >
+              <Polyline
+                path={[
+                  searchLocation,
+                  {
                     lat: closest.balloon.latitude,
                     lng: closest.balloon.longitude,
-                  }}
-                  icon={{
-                    path: google.maps.SymbolPath.CIRCLE,
-                    fillColor: "green",
-                    fillOpacity: 1,
-                    scale: 7,
-                    strokeColor: "green",
-                    strokeWeight: 1,
-                  }}
-                  onClick={() => onMarkerClick(closest.balloon)}
-                />
-              </React.Fragment>
-            );
-          })}
+                  },
+                ]}
+                options={{
+                  strokeColor: "green",
+                  strokeOpacity: 0.8,
+                  strokeWeight: 2,
+                }}
+              />
+              <Marker
+                position={{
+                  lat: closest.balloon.latitude,
+                  lng: closest.balloon.longitude,
+                }}
+                icon={{
+                  path: google.maps.SymbolPath.CIRCLE,
+                  fillColor: "green",
+                  fillOpacity: 1,
+                  scale: 7,
+                  strokeColor: "green",
+                  strokeWeight: 1,
+                }}
+                onClick={() => onMarkerClick(closest.balloon)}
+              />
+            </React.Fragment>
+          ))}
         <GradientOverlay polygons={gradientPolygons} />
       </GoogleMap>
       <BalloonDetailModal
@@ -361,6 +373,7 @@ const Map = () => {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
       />
+      <TemperatureLegend minTemp={tempRange.min} maxTemp={tempRange.max} />
     </>
   );
 };

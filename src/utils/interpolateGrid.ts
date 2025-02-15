@@ -7,12 +7,18 @@ export interface GradientPolygon {
   fillColor: string;
 }
 
+export interface GradientResult {
+  polygons: GradientPolygon[];
+  minTemp: number;
+  maxTemp: number;
+}
+
 export const generateGradientPolygon = (
   center: google.maps.LatLngLiteral,
   points: BalloonWithDistance[],
   delta: number,
   cellSize: number = 1,
-): GradientPolygon[] => {
+): GradientResult => {
   // Create a bounding box around the center: [minLng, minLat, maxLng, maxLat]
   const bbox = [
     center.lng - delta,
@@ -72,5 +78,5 @@ export const generateGradientPolygon = (
     return { path, fillColor };
   });
 
-  return polygons;
+  return { polygons, minTemp, maxTemp };
 };
