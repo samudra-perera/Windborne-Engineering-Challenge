@@ -1,50 +1,23 @@
-# React + TypeScript + Vite
+# WindBorne Engineering Challenge
+## Usage and Features
+1. Displays all the data points from the API onto a world map, the API is fetched every 5 minutes. If there is any weird data corruption that I could not parse it defaults to the live API (00.json).
+2. The search allows the user to find a location and then find the 5 closest balloons to that searched location. Overlayed ontop is a temperature gradient that was estimated by taking the temperatures from those 5 locations and creating a linear gradient amongst them. (This could be inaccurate)
+3. Clicking on any of the balloon points will display a variety of weather data alongside giving the geolocation as a google plus code for easier search.
+4. ToggleGroup to display historical data
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## APIs Used
+1. Google Maps API
+2. Open weather API
+3. Windborne Balloon Location API
 
-Currently, two official plugins are available:
+## Future Improvements
+1. Better data parsing --> Although I did a decent job, I think there is one case that I could have done better on.
+2. Additional features built on top of the weather --> Humidity gradients, wind vectors, pressue etc etc
+3. A Cleaner UI, although given the time spent I think it looks half decent. I tried to mimic one of Windborne's current applications.
+4. Add a slider for the historical data so a user could query all the times 0-23h
+5. Dynamically calculate the 5 closest points on change, this would require just a small rework of the current functionality.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## Bugs
+1. If the historical time has an error on fetch, the toggle group does not update to the "live" button
+2. Re-rendering the entire map every time I search --> no direct access to the Polyline API since I am accessing it via a google-react-maps package
+3. Could have reduced the amount of state usage, but did so to increase dev speed.
