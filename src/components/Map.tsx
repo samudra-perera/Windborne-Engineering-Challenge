@@ -19,7 +19,12 @@ import {
   GradientPolygon,
 } from "../utils/interpolateGrid";
 import GradientOverlay from "./GradientOverlay";
-import { ToggleButton, ToggleButtonGroup } from "@mui/material";
+import {
+  ToggleButton,
+  ToggleButtonGroup,
+  FormControlLabel,
+  Switch,
+} from "@mui/material";
 import AverageWeatherModal from "./AverageWeatherModal";
 
 const containerStyle = {
@@ -97,6 +102,7 @@ const Map = () => {
     min: 0,
     max: 0,
   });
+  const [showGradientOverlay, setShowGradientOverlay] = useState(true);
 
   const onLoad = (auto: google.maps.places.Autocomplete) => {
     setAutoComplete(auto);
@@ -158,12 +164,42 @@ const Map = () => {
     }
   };
 
+  //Handler for the gradient overlay toggle
+  const handleGradientToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setShowGradientOverlay(event.target.checked);
+  };
+
   if (!isLoaded) return <div>Loading Map...</div>;
   if (loading) return <div>Loading Balloon Data...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <>
+      {searchLocation && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: "120px",
+            left: "20px",
+            zIndex: 10,
+            backgroundColor: "rgba(0,0,0,0.7)",
+            borderRadius: "8px",
+            padding: "8px",
+          }}
+        >
+          <FormControlLabel
+            control={
+              <Switch
+                checked={showGradientOverlay}
+                onChange={handleGradientToggle}
+                color="primary"
+              />
+            }
+            label="Show Gradient Overlay"
+            style={{ color: "white" }}
+          />
+        </div>
+      )}
       <div
         style={{
           position: "absolute",
@@ -371,7 +407,9 @@ const Map = () => {
               />
             </React.Fragment>
           ))}
-        <GradientOverlay polygons={gradientPolygons} />
+        {searchLocation && showGradientOverlay && (
+          <GradientOverlay polygons={gradientPolygons} />
+        )}
       </GoogleMap>
       <BalloonDetailModal
         balloon={selectedBalloon}
